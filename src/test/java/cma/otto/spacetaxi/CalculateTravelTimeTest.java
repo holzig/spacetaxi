@@ -3,8 +3,8 @@ package cma.otto.spacetaxi;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,6 +50,19 @@ public class CalculateTravelTimeTest {
         }
     }
 
+    private static class Route {
+        private final List<Highway> usedHighways = new ArrayList<>();
+
+        public void addHighway(Highway highway) {
+            usedHighways.add(highway);
+        }
+
+        public int calculateTravelTime() {
+            return usedHighways.stream().map(highway -> highway.travelTime).reduce(0, Integer::sum);
+        }
+
+    }
+
     private Collection<Highway> highways = Arrays.asList(
             new Highway("Solar System", "Alpha Centauri", 5),
             new Highway("Alpha Centauri", "Sirius", 4),
@@ -63,16 +76,16 @@ public class CalculateTravelTimeTest {
     );
 
     private int calculateTravelTime(String... systems) {
-        int time = 0;
+        Route route = new Route();
         for (int i = 0; i < systems.length - 1; i++) {
             String start = systems[i];
             String target = systems[i + 1];
             Highway highway = highways.stream()
                     .filter((h) -> h.start.equals(start) && h.target.equals(target))
                     .findFirst().orElseThrow(() -> new IllegalArgumentException("NO SUCH ROUTE"));
-            time += highway.travelTime;
+            route.addHighway(highway);
         }
-        return time;
+        return route.calculateTravelTime();
     }
 
 }
