@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,31 +35,6 @@ public class CalculateTravelTimeTest {
             calculateTravelTime("Solar System", "Vega", "Betelgeuse");
         });
         assertThat(ex).hasMessage("NO SUCH ROUTE");
-    }
-
-    private static class Highway {
-        private final String start;
-        private final String target;
-        private final int travelTime;
-
-        private Highway(String start, String target, int travelTime) {
-            this.start = start;
-            this.target = target;
-            this.travelTime = travelTime;
-        }
-    }
-
-    private static class Route {
-        private final List<Highway> usedHighways = new ArrayList<>();
-
-        public void addHighway(Highway highway) {
-            usedHighways.add(highway);
-        }
-
-        public int calculateTravelTime() {
-            return usedHighways.stream().map(highway -> highway.travelTime).reduce(0, Integer::sum);
-        }
-
     }
 
     private Collection<Highway> highways = Arrays.asList(
