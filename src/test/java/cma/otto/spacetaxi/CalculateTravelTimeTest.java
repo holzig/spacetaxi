@@ -3,6 +3,9 @@ package cma.otto.spacetaxi;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CalculateTravelTimeTest {
@@ -35,72 +38,39 @@ public class CalculateTravelTimeTest {
         assertThat(ex).hasMessage("NO SUCH ROUTE");
     }
 
+    private static class Highway {
+        private final String start;
+        private final String target;
+        private final int travelTime;
+
+        private Highway(String start, String target, int travelTime) {
+            this.start = start;
+            this.target = target;
+            this.travelTime = travelTime;
+        }
+    }
+
+    private Collection<Highway> highways = Arrays.asList(
+            new Highway("Solar System", "Alpha Centauri", 5),
+            new Highway("Alpha Centauri", "Sirius", 4),
+            new Highway("Sirius", "Betelgeuse", 8),
+            new Highway("Betelgeuse", "Sirius", 8),
+            new Highway("Betelgeuse", "Vega", 6),
+            new Highway("Solar System", "Betelgeuse", 5),
+            new Highway("Sirius", "Vega", 2),
+            new Highway("Vega", "Alpha Centauri", 3),
+            new Highway("Solar System", "Vega", 7)
+    );
+
     private int calculateTravelTime(String... systems) {
         int time = 0;
         for (int i = 0; i < systems.length - 1; i++) {
             String start = systems[i];
             String target = systems[i + 1];
-            switch (start) {
-                case "Solar System":
-                    switch (target) {
-                        case "Alpha Centauri":
-                            time += 5;
-                            break;
-                        case "Betelgeuse":
-                            time += 5;
-                            break;
-                        case "Vega":
-                            time += 7;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("NO SUCH ROUTE");
-                    }
-                    break;
-                case "Alpha Centauri":
-                    switch (target) {
-                        case "Sirius":
-                            time += 4;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("NO SUCH ROUTE");
-                    }
-                    break;
-                case "Sirius":
-                    switch (target) {
-                        case "Betelgeuse":
-                            time += 8;
-                            break;
-                        case "Vega":
-                            time += 2;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("NO SUCH ROUTE");
-                    }
-                    break;
-                case "Betelgeuse":
-                    switch (target) {
-                        case "Sirius":
-                            time += 8;
-                            break;
-                        case "Vega":
-                            time += 6;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("NO SUCH ROUTE");
-                    }
-                    break;
-                case "Vega":
-                    switch (target) {
-                        case "Alpha Centauri":
-                            time += 3;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("NO SUCH ROUTE");
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("NO SUCH ROUTE");
-            }
+            Highway highway = highways.stream()
+                    .filter((h) -> h.start.equals(start) && h.target.equals(target))
+                    .findFirst().orElseThrow(() -> new IllegalArgumentException("NO SUCH ROUTE"));
+            time += highway.travelTime;
         }
         return time;
     }
