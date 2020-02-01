@@ -1,12 +1,16 @@
 package cma.otto.spacetaxi;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FindRoutesTest {
 
@@ -66,9 +70,47 @@ public class FindRoutesTest {
         assertThat(routes).containsOnly(new Route(a_c, c_a));
     }
 
+    @Test
+    public void testRouteConditionCheckFailed() {
+        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        RouteCondition check = mock(RouteCondition.class);
+        when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
+
+        assertThat(findRoutes(highways, "B", "A", Collections.singletonList(check))).isEmpty();
+    }
+
+    @Test
+    public void testRouteConditionCheckSuccess() {
+        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        RouteCondition check = mock(RouteCondition.class);
+        when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
+
+        assertThat(findRoutes(highways, "B", "A", Collections.singletonList(check))).hasSize(1);
+    }
+
+    @Test
+    public void testMultipleRouteConditionsOneFails() {
+        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        RouteCondition success = mock(RouteCondition.class);
+        when(success.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
+        RouteCondition failure = mock(RouteCondition.class);
+        when(failure.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
+
+        assertThat(findRoutes(highways, "B", "A", Arrays.asList(success, failure))).isEmpty();
+    }
+
     private List<Route> findRoutes(List<Highway> highways, String start, String target) {
-        Map<String, List<Highway>> highwaysByStartSystem = highways.stream().collect(Collectors.groupingBy(highway -> highway.start));
-        return findRoutes(highwaysByStartSystem, start, target);
+        return findRoutes(highways, start, target, Collections.emptyList());
+    }
+
+    private List<Route> findRoutes(List<Highway> highways, String start, String target, List<Predicate<Route>> checks) {
+        Map<String, List<Highway>> highwaysByStartSystem = highways.stream()
+                .collect(Collectors.groupingBy(highway -> highway.start));
+        Predicate<Route> filter = checks.stream()
+                .reduce(x -> true, Predicate::and);
+        return findRoutes(highwaysByStartSystem, start, target).stream()
+                .filter(filter)
+                .collect(toList());
     }
 
     private List<Route> findRoutes(Map<String, List<Highway>> highwaysByStartSystem, String start, String target) {
