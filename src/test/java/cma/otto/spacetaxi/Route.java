@@ -1,6 +1,11 @@
 package cma.otto.spacetaxi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.joining;
 
 class Route {
     final List<Highway> usedHighways;
@@ -38,5 +43,18 @@ class Route {
     @Override
     public int hashCode() {
         return Objects.hash(usedHighways);
+    }
+
+    @Override
+    public String toString() {
+        List<String> steps = new ArrayList<>(usedHighways.size());
+        for (int i = 0; i < usedHighways.size(); i++) {
+            Highway highway = usedHighways.get(i);
+            steps.add(highway.start);
+            if (i == usedHighways.size() - 1) {
+                steps.add(highway.target);
+            }
+        }
+        return String.format("Route{%s steps: %s}(%s)", steps.size(), steps.stream().collect(joining(" -> ")), calculateTravelTime());
     }
 }

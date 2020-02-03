@@ -3,11 +3,11 @@ package cma.otto.spacetaxi;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CalculateTravelTimeTest {
+
+    private final DefaultDataset defaultDataset = new DefaultDataset();
 
     @Test
     public void testSolarSystemAlphaCentauriSirius() {
@@ -37,24 +37,12 @@ public class CalculateTravelTimeTest {
         assertThat(ex).hasMessage("NO SUCH ROUTE");
     }
 
-    private Collection<Highway> highways = Arrays.asList(
-            new Highway("Solar System", "Alpha Centauri", 5),
-            new Highway("Alpha Centauri", "Sirius", 4),
-            new Highway("Sirius", "Betelgeuse", 8),
-            new Highway("Betelgeuse", "Sirius", 8),
-            new Highway("Betelgeuse", "Vega", 6),
-            new Highway("Solar System", "Betelgeuse", 5),
-            new Highway("Sirius", "Vega", 2),
-            new Highway("Vega", "Alpha Centauri", 3),
-            new Highway("Solar System", "Vega", 7)
-    );
-
     private int calculateTravelTime(String... systems) {
         Route route = new Route();
         for (int i = 0; i < systems.length - 1; i++) {
             String start = systems[i];
             String target = systems[i + 1];
-            Highway highway = highways.stream()
+            Highway highway = DefaultDataset.highways.stream()
                     .filter((h) -> h.start.equals(start) && h.target.equals(target))
                     .findFirst().orElseThrow(() -> new IllegalArgumentException("NO SUCH ROUTE"));
             route.addHighway(highway);
