@@ -4,11 +4,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.groupingBy;
+
 public class RouteParser {
     private Map<Object, List<Highway>> highways;
 
     public RouteParser(Map<Object, List<Highway>> highways) {
         this.highways = highways;
+    }
+
+    public RouteParser(List<Highway> highways) {
+        this(highways.stream().collect(groupingBy(highway -> highway.start)));
     }
 
     Route parse(String routeAsString) {

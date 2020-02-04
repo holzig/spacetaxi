@@ -1,6 +1,9 @@
 package cma.otto.spacetaxi;
 
-import java.util.function.Predicate;
+import java.util.List;
 
-public interface RouteCondition extends Predicate<Route> {
+public interface RouteCondition {
+
+    boolean check(Route route, List<Route> routes);
+
 }
