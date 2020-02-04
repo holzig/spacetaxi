@@ -1,9 +1,6 @@
 package cma.otto.spacetaxi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -80,4 +77,41 @@ public class RouteFinder {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+
+    public List<Route> findShortestRoute(String start, String target) {
+        List<Highway> highways = this.highwaysByStartSystem.get(start);
+        Queue<Route> candidateRoutes = highways.stream()
+                .map(Route::new)
+                .collect(Collectors.toCollection(LinkedList::new));
+
+        List<Route> routes = new ArrayList<>();
+        while (!candidateRoutes.isEmpty()) {
+            Route candidate = candidateRoutes.poll();
+            int candidateLength = candidate.calculateTravelTime();
+            int lengthOfCurrentRoutes = routes.stream()
+                    .map(Route::calculateTravelTime)
+                    .findFirst()
+                    .orElse(Integer.MAX_VALUE);
+
+            if (candidateLength <= lengthOfCurrentRoutes) {
+                if (candidate.hasReached(target)) {
+                    if (candidateLength < lengthOfCurrentRoutes) {
+                        routes = new ArrayList<>();
+                    }
+                    routes.add(candidate);
+                } else {
+                    candidateRoutes.addAll(findNewCandidates(candidate));
+                }
+            }
+        }
+        return routes;
+    }
+
+    public List<Route> findNewCandidates(Route start) {
+        List<Highway> highways = this.highwaysByStartSystem.getOrDefault(start.getFinalTarget(), emptyList());
+        return highways.stream()
+                .map(start::extendBy)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
 }

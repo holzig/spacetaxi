@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static java.util.stream.Collectors.joining;
-
-class Route {
+public class Route {
     final List<Highway> usedHighways;
 
     Route(List<Highway> steps) {
@@ -30,6 +28,10 @@ class Route {
 
     public int calculateTravelTime() {
         return usedHighways.stream().map(highway -> highway.travelTime).reduce(0, Integer::sum);
+    }
+
+    public String getFinalTarget() {
+        return usedHighways.get(usedHighways.size() - 1).target;
     }
 
     @Override
@@ -55,6 +57,16 @@ class Route {
                 steps.add(highway.target);
             }
         }
-        return String.format("Route{%s steps: %s}(%s)", steps.size(), steps.stream().collect(joining(" -> ")), calculateTravelTime());
+        return String.format("Route{%s steps: %s}(%s)", steps.size(), String.join(" -> ", steps), calculateTravelTime());
+    }
+
+    public Route extendBy(Highway extension) {
+        Route route = new Route(usedHighways);
+        route.addHighway(extension);
+        return route;
+    }
+
+    boolean hasReached(String target) {
+        return getFinalTarget().equals(target);
     }
 }

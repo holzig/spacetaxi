@@ -64,7 +64,7 @@ public class Exercises {
     public void excercise7() {
         List<Route> routes = routeFinder.findRoutes("Solar System", "Sirius", singletonList(((route) -> route.usedHighways.size() == 4)));
         assertThat(routes)
-                .containsOnly(
+                .containsExactlyInAnyOrder(
                         routeParser.parse("Solar System -> Alpha Centauri -> Sirius -> Betelgeuse -> Sirius"),
                         routeParser.parse("Solar System -> Betelgeuse -> Sirius -> Betelgeuse -> Sirius"),
                         routeParser.parse("Solar System -> Betelgeuse -> Vega -> Alpha Centauri -> Sirius")
@@ -72,16 +72,20 @@ public class Exercises {
     }
 
 
-    //@Test
+    @Test
     @DisplayName("Determine the duration of the shortest routes (in traveltime) between solar system and  Sirius")
     public void excercise8() {
-        //TODO implement
+        assertThat(routeFinder.findShortestRoute("Solar System", "Sirius"))
+                .extractingResultOf("calculateTravelTime")
+                .containsOnly(9);
     }
 
-    //@Test
+    @Test
     @DisplayName("Determine the duration of the shortest routes (in traveltime) starting at Alpha Centauri and ending at Alpha Centauri")
     public void excercise9() {
-        //TODO implement
+        assertThat(routeFinder.findShortestRoute("Alpha Centauri", "Alpha Centauri"))
+                .extractingResultOf("calculateTravelTime")
+                .containsOnly(9);
     }
 
     //@Test
