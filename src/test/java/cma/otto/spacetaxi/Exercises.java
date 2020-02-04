@@ -1,5 +1,6 @@
 package cma.otto.spacetaxi;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,38 @@ public class Exercises {
     private final RouteParser routeParser = new RouteParser(DefaultDataset.highwaysByStartsystem);
     private final RouteFinder routeFinder = new RouteFinder();
 
-    //TODO: move testcases from #cma.otto.spacetaxi.CalculateTravelTimeTest to this class
+    @Test
+    @DisplayName("The distance of route Solar System -> Alpha Centauri -> Sirius")
+    public void excercise1() {
+        assertThat(routeParser.parse("Solar System -> Alpha Centauri -> Sirius").calculateTravelTime()).isEqualTo(9);
+    }
+
+    @Test
+    @DisplayName("The distance of route Solar System -> Betelgeuse")
+    public void excercise2() {
+        assertThat(routeParser.parse("Solar System -> Betelgeuse").calculateTravelTime()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("The distance of route Solar System -> Betelgeuse -> Sirius")
+    public void excercise3() {
+        assertThat(routeParser.parse("Solar System -> Betelgeuse -> Sirius").calculateTravelTime()).isEqualTo(13);
+    }
+
+    @Test
+    @DisplayName("The distance of route Solar System -> Vega -> Alpha Centauri -> Sirius -> Betelgeuse")
+    public void excercise4() {
+        assertThat(routeParser.parse("Solar System -> Vega -> Alpha Centauri -> Sirius -> Betelgeuse").calculateTravelTime()).isEqualTo(22);
+    }
+
+    @Test
+    @DisplayName("The distance of route Solar System -> Vega -> Betelgeuse")
+    public void excercise5() {
+        Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            assertThat(routeParser.parse("Solar System -> Vega -> Betelgeuse").calculateTravelTime()).isEqualTo(9);
+        });
+        assertThat(ex).hasMessage("NO SUCH ROUTE");
+    }
 
     @Test
     @DisplayName("Determine all routes starting at Sirius and ending at Sirius with a maximum of 3 stops")
