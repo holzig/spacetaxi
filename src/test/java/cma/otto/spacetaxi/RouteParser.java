@@ -7,7 +7,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.groupingBy;
 
 public class RouteParser {
-    private Map<Object, List<Highway>> highways;
+    private final Map<Object, List<Highway>> highways;
 
     public RouteParser(Map<Object, List<Highway>> highways) {
         this.highways = highways;

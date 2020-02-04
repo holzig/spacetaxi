@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class Exercises {
 
-    private final RouteParser routeParser = new RouteParser(DefaultDataset.highwaysByStartsystem);
+    private final RouteParser routeParser = new RouteParser(DefaultDataset.highwaysByStartSystem);
     private final RouteFinder routeFinder = new RouteFinder(DefaultDataset.highways);
 
     @Test
@@ -40,9 +40,10 @@ public class Exercises {
     @Test
     @DisplayName("The distance of route Solar System -> Vega -> Betelgeuse")
     public void exercise5() {
-        Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            assertThat(routeParser.parse("Solar System -> Vega -> Betelgeuse").calculateTravelTime()).isEqualTo(9);
-        });
+        Exception ex = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> assertThat(routeParser.parse("Solar System -> Vega -> Betelgeuse").calculateTravelTime()).isEqualTo(9)
+        );
         assertThat(ex).hasMessage("NO SUCH ROUTE");
     }
 
@@ -58,7 +59,7 @@ public class Exercises {
     }
 
     @Test
-    @DisplayName("Determine the number of routes starting at the solar system and ending at Sirius with exactly 3 stops inbetween.")
+    @DisplayName("Determine the number of routes starting at the solar system and ending at Sirius with exactly 3 stops in between.")
     public void exercise7() {
         List<Route> routes = routeFinder.findRoutesWithExactStops("Solar System", "Sirius", 4);
         assertThat(routes)
@@ -71,7 +72,7 @@ public class Exercises {
 
 
     @Test
-    @DisplayName("Determine the duration of the shortest routes (in traveltime) between solar system and  Sirius")
+    @DisplayName("Determine the duration of the shortest routes (in travel time) between solar system and  Sirius")
     public void exercise8() {
         assertThat(routeFinder.findShortestRoute("Solar System", "Sirius"))
                 .extractingResultOf("calculateTravelTime")
@@ -79,7 +80,7 @@ public class Exercises {
     }
 
     @Test
-    @DisplayName("Determine the duration of the shortest routes (in traveltime) starting at Alpha Centauri and ending at Alpha Centauri")
+    @DisplayName("Determine the duration of the shortest routes (in travel time) starting at Alpha Centauri and ending at Alpha Centauri")
     public void exercise9() {
         assertThat(routeFinder.findShortestRoute("Alpha Centauri", "Alpha Centauri"))
                 .extractingResultOf("calculateTravelTime")
@@ -87,7 +88,7 @@ public class Exercises {
     }
 
     @Test
-    @DisplayName("Determine all different routes starting at Sirius and ending at Sirius with an over traveltime less than 30.")
+    @DisplayName("Determine all different routes starting at Sirius and ending at Sirius with an over travel time less than 30.")
     public void exercise10() {
         List<Route> routes = routeFinder.findRoutesWithMaxTravelTime("Sirius", "Sirius", 29);
         assertThat(routes)

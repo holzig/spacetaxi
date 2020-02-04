@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Route {
     final List<Highway> usedHighways;
@@ -15,11 +16,6 @@ public class Route {
 
     Route(Highway... highways) {
         this(Arrays.asList(highways));
-    }
-
-    Route(Highway firstStep, List<Highway> remainingSteps) {
-        this(firstStep);
-        remainingSteps.forEach(this::addHighway);
     }
 
     public void addHighway(Highway highway) {
@@ -70,17 +66,21 @@ public class Route {
         return getFinalTarget().equals(target);
     }
 
-    public boolean endsWith(Route route) {
-        if (this.usedHighways.size() < route.usedHighways.size()) {
-            return false;
-        }
-        for (int i = route.usedHighways.size() - 1; i >= 0; i--) {
-            Highway highway = this.usedHighways.get(this.usedHighways.size() - route.usedHighways.size() + i);
-            Highway highway1 = route.usedHighways.get(i);
-            if (!highway.equals(highway1)) {
-                return false;
+    public boolean containsLoop() {
+        String allHighways = usedHighways.stream().map(this::hts).collect(Collectors.joining(", "));
+
+        for (int i = 0; i < usedHighways.size() - 1; i++) {
+            String hts = hts(usedHighways.get(i));
+            String[] split = allHighways.split(hts, -1);
+            int count = split.length - 1;
+            if (count > 1) {
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    public String hts(Highway highway) {
+        return String.format("%s -> %s", highway.start, highway.target);
     }
 }

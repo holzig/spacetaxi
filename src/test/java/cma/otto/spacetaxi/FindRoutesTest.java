@@ -38,7 +38,7 @@ public class FindRoutesTest {
     }
 
     @Test
-    public void testMultiplePossibleRoundtrips() {
+    public void testMultiplePossibleRoundTrips() {
         List<Highway> highways = asList(a_b, b_a, a_c, c_b);
         List<Route> routes = new RouteFinder(highways).findRouteWithMaxStops("A", "A", 3);
         assertThat(routes).containsOnly(new Route(a_b, b_a), new Route(a_c, c_b, b_a));
@@ -65,7 +65,7 @@ public class FindRoutesTest {
     }
 
     @Test
-    public void testShortestRouteRoundtripPossibleButNotTraveled() {
+    public void testShortestRouteRoundTripPossibleButNotTraveled() {
         List<Highway> highways = asList(a_b, b_c);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "B");
@@ -73,7 +73,7 @@ public class FindRoutesTest {
     }
 
     @Test
-    public void testShortestRouteRoundtripTraveled() {
+    public void testShortestRouteRoundTripTraveled() {
         List<Highway> highways = asList(a_b, b_a);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "A");
@@ -89,7 +89,7 @@ public class FindRoutesTest {
     }
 
     @Test
-    public void testShortestRouteRoundtripMultipleDifferentRoutesPossible() {
+    public void testShortestRouteRoundTripMultipleDifferentRoutesPossible() {
         List<Highway> highways = asList(a_b, b_a, a_c, h("C", "A", 2));
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "A");
@@ -105,7 +105,7 @@ public class FindRoutesTest {
     }
 
     @Test
-    public void testSinglePossibleRoundtripsWithDeadEnds() {
+    public void testSinglePossibleRoundTripsWithDeadEnds() {
         List<Highway> highways = asList(a_b, a_c, a_d, c_a);
         List<Route> routes = new RouteFinder(highways).findShortestRoute("A", "A");
         assertThat(routes).containsOnly(new Route(a_c, c_a));

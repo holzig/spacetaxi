@@ -19,5 +19,5 @@ public class DefaultDataset {
             new Highway("Solar System", "Vega", 7)
     );
 
-    public static final Map<Object, List<Highway>> highwaysByStartsystem = highways.stream().collect(groupingBy(highway -> highway.start));
+    public static final Map<Object, List<Highway>> highwaysByStartSystem = highways.stream().collect(groupingBy(highway -> highway.start));
 }
