@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -75,16 +76,15 @@ public class FindRoutesTest {
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Collections.singletonList(check))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", singletonList(check))).isEmpty();
     }
 
     @Test
     public void testRouteConditionCheckSuccess() {
         List<Highway> highways = Arrays.asList(b_c, c_a);
-        RouteCondition check = mock(RouteCondition.class);
-        when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
+        RouteCondition check = (route) -> true;
 
-        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Collections.singletonList(check))).hasSize(1);
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", singletonList(check))).hasSize(1);
     }
 
     @Test

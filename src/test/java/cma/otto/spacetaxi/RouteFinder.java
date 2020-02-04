@@ -49,13 +49,15 @@ public class RouteFinder {
     }
 
     public List<Route> findRoutesCircle(String start, String target, List<Predicate<Route>> checks) {
-
-        return findRoutesc(start, checks, null, route -> route.usedHighways.get(route.usedHighways.size() - 1).target.equals(target));
+        return findRoutesc(start, checks, null, route -> route.usedHighways.get(route.usedHighways.size() - 1).target.equals(target), emptyList());
     }
 
 
-    private List<Route> findRoutesc(String start, List<Predicate<Route>> checks, Route prevroute, Predicate<Route> endCondition) {
-        List<Highway> highwaysFromHere = this.highwaysByStartSystem.getOrDefault(start, emptyList());
+    private List<Route> findRoutesc(String start, List<Predicate<Route>> checks, Route prevroute, Predicate<Route> endCondition, List<Route> foundRoutes) {
+        List<Highway> highwaysFromHere = this.highwaysByStartSystem.get(start);
+        if (highwaysFromHere == null) {
+            return foundRoutes;
+        }
         return highwaysFromHere.stream()
                 .map(highway -> {
                     Route route = new Route();
@@ -65,16 +67,17 @@ public class RouteFinder {
                     route.addHighway(highway);
 
                     boolean matches = checks.stream().allMatch(c -> c.test(route));
-                    List<Route> routes = new ArrayList<>();
+                    List<Route> routes = new ArrayList<>(foundRoutes);
                     if (matches) {
                         if (endCondition.test(route)) {
                             routes.add(route);
                         }
-                        routes.addAll(findRoutesc(highway.target, checks, route, endCondition));
+                        return findRoutesc(highway.target, checks, route, endCondition, routes);
+                    } else {
+                        return routes;
                     }
-
-                    return routes;
-                }).flatMap(List::stream)
+                })
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
 }
