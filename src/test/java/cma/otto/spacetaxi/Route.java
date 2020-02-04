@@ -69,4 +69,18 @@ public class Route {
     boolean hasReached(String target) {
         return getFinalTarget().equals(target);
     }
+
+    public boolean endsWith(Route route) {
+        if (this.usedHighways.size() < route.usedHighways.size()) {
+            return false;
+        }
+        for (int i = route.usedHighways.size() - 1; i >= 0; i--) {
+            Highway highway = this.usedHighways.get(this.usedHighways.size() - route.usedHighways.size() + i);
+            Highway highway1 = route.usedHighways.get(i);
+            if (!highway.equals(highway1)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

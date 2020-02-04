@@ -84,6 +84,8 @@ public class RouteFinder {
                 .map(Route::new)
                 .collect(Collectors.toCollection(LinkedList::new));
 
+        List<Route> rejectedCandidates = new ArrayList<>();
+
         List<Route> routes = new ArrayList<>();
         while (!candidateRoutes.isEmpty()) {
             Route candidate = candidateRoutes.poll();
@@ -100,8 +102,13 @@ public class RouteFinder {
                     }
                     routes.add(candidate);
                 } else {
-                    candidateRoutes.addAll(findNewCandidates(candidate));
+                    rejectedCandidates.add(candidate);
+                    findNewCandidates(candidate).stream()
+                            .filter(route -> rejectedCandidates.stream().noneMatch(route::endsWith))
+                            .forEach(candidateRoutes::add);
                 }
+            } else {
+                rejectedCandidates.add(candidate);
             }
         }
         return routes;

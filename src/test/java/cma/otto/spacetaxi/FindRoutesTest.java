@@ -3,10 +3,10 @@ package cma.otto.spacetaxi;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -23,56 +23,55 @@ public class FindRoutesTest {
     private final Highway c_b = new Highway("C", "B", 1);
 
     @Test
-    public void testWithSingleHighway() {
-        List<Highway> highways = Arrays.asList(a_b);
-        assertThat(new RouteFinder(highways).findRoutesCircle("A", "B", Collections.emptyList()))
-                .containsOnly(new Route(a_b));
+    public void testWithNoRouteFound() {
+        List<Highway> highways = singletonList(a_b);
+        assertThat(new RouteFinder(highways).findShortestRoute("A", "C")).isEmpty();
     }
 
     @Test
-    public void testWithNoRouteFound() {
-        List<Highway> highways = Arrays.asList(a_b);
-        assertThat(new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList())).isEmpty();
+    public void testWithNoRouteFoundButCircleAvailable() {
+        List<Highway> highways = asList(a_b, b_a);
+        assertThat(new RouteFinder(highways).findShortestRoute("A", "C")).isEmpty();
     }
 
     @Test
     public void testMultipleStepsSingleRoute() {
-        List<Highway> highways = Arrays.asList(a_b, b_c);
+        List<Highway> highways = asList(a_b, b_c);
         List<Route> routes = new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList());
         assertThat(routes).containsOnly(new Route(a_b, b_c));
     }
 
     @Test
     public void testMultipleStepsMultipleRoutes() {
-        List<Highway> highways = Arrays.asList(a_b, b_c, a_c);
+        List<Highway> highways = asList(a_b, b_c, a_c);
         List<Route> routes = new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList());
         assertThat(routes).containsOnly(new Route(a_b, b_c), new Route(a_c));
     }
 
     @Test
     public void testRoundtrip() {
-        List<Highway> highways = Arrays.asList(a_b, b_a);
+        List<Highway> highways = asList(a_b, b_a);
         List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_b, b_a));
     }
 
     @Test
     public void testMultiplePossibleRoundtrips() {
-        List<Highway> highways = Arrays.asList(a_b, b_a, a_c, c_b);
+        List<Highway> highways = asList(a_b, b_a, a_c, c_b);
         List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_b, b_a), new Route(a_c, c_b, b_a));
     }
 
     @Test
     public void testSinglePossibleRoundtripsWithDeadEnds() {
-        List<Highway> highways = Arrays.asList(a_b, a_c, a_d, c_a);
+        List<Highway> highways = asList(a_b, a_c, a_d, c_a);
         List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_c, c_a));
     }
 
     @Test
     public void testRouteConditionCheckFailed() {
-        List<Highway> highways = Arrays.asList(b_c, c_a);
+        List<Highway> highways = asList(b_c, c_a);
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
@@ -81,7 +80,7 @@ public class FindRoutesTest {
 
     @Test
     public void testRouteConditionCheckSuccess() {
-        List<Highway> highways = Arrays.asList(b_c, c_a);
+        List<Highway> highways = asList(b_c, c_a);
         RouteCondition check = (route) -> true;
 
         assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", singletonList(check))).hasSize(1);
@@ -89,18 +88,18 @@ public class FindRoutesTest {
 
     @Test
     public void testMultipleRouteConditionsOneFails() {
-        List<Highway> highways = Arrays.asList(b_c, c_a);
+        List<Highway> highways = asList(b_c, c_a);
         RouteCondition success = mock(RouteCondition.class);
         when(success.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
         RouteCondition failure = mock(RouteCondition.class);
         when(failure.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Arrays.asList(success, failure))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", asList(success, failure))).isEmpty();
     }
 
     @Test
     public void testCircle() {
-        List<Highway> highways = Arrays.asList(a_b, b_a);
+        List<Highway> highways = asList(a_b, b_a);
         RouteCondition maxSize = (r) -> r.usedHighways.size() <= 5;
 
         List<Route> routesCircle = new RouteFinder(highways).findRoutesCircle("A", "A", singletonList(maxSize));
@@ -112,7 +111,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRoute() {
-        List<Highway> highways = Arrays.asList(a_b);
+        List<Highway> highways = singletonList(a_b);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "B");
         assertThat(route).containsOnly(new Route(a_b));
@@ -120,7 +119,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteRoundtripPossibleButNotTraveled() {
-        List<Highway> highways = Arrays.asList(a_b, b_c);
+        List<Highway> highways = asList(a_b, b_c);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "B");
         assertThat(route).containsOnly(new Route(a_b));
@@ -128,7 +127,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteRoundtripTraveled() {
-        List<Highway> highways = Arrays.asList(a_b, b_a);
+        List<Highway> highways = asList(a_b, b_a);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "A");
         assertThat(route).containsOnly(new Route(a_b, b_a));
@@ -136,7 +135,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteMultipleEqualRoutesPossible() {
-        List<Highway> highways = Arrays.asList(a_b, b_a, a_c, c_a);
+        List<Highway> highways = asList(a_b, b_a, a_c, c_a);
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "A");
         assertThat(route).containsOnly(new Route(a_b, b_a), new Route(a_c, c_a));
@@ -144,7 +143,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteRoundtripMultipleDifferentRoutesPossible() {
-        List<Highway> highways = Arrays.asList(a_b, b_a, a_c, h("C", "A", 2));
+        List<Highway> highways = asList(a_b, b_a, a_c, h("C", "A", 2));
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "A");
         assertThat(route).containsOnly(new Route(a_b, b_a));
@@ -152,7 +151,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteMultipleRoutesWithFewerSteps() {
-        List<Highway> highways = Arrays.asList(a_b, b_c, h("A", "C", 5));
+        List<Highway> highways = asList(a_b, b_c, h("A", "C", 5));
 
         List<Route> route = new RouteFinder(highways).findShortestRoute("A", "C");
         assertThat(route).containsOnly(new Route(a_b, b_c));
@@ -160,7 +159,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteMultipleDifferentRoutesPossible() {
-        List<Highway> highways = Arrays.asList(
+        List<Highway> highways = asList(
                 a_b,
                 h("B", "D", 2),
                 a_c,
@@ -173,7 +172,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteMultipleLongerRoutes() {
-        List<Highway> highways = Arrays.asList(
+        List<Highway> highways = asList(
                 h("A", "B", 1),
                 h("B", "C", 1),
                 h("C", "F", 3),
@@ -188,7 +187,7 @@ public class FindRoutesTest {
 
     @Test
     public void testShortestRouteMultipleLongerRoutesWithPossibleWayBack() {
-        List<Highway> highways = Arrays.asList(
+        List<Highway> highways = asList(
                 h("A", "B", 1),
                 h("B", "A", 1),
                 h("B", "C", 1),
