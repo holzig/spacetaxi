@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Exercises {
 
     private final RouteParser routeParser = new RouteParser(DefaultDataset.highwaysByStartsystem);
-    private final RouteFinder routeFinder = new RouteFinder();
+    private final RouteFinder routeFinder = new RouteFinder(DefaultDataset.highways);
 
     @Test
     @DisplayName("The distance of route Solar System -> Alpha Centauri -> Sirius")
@@ -51,7 +51,7 @@ public class Exercises {
     @Test
     @DisplayName("Determine all routes starting at Sirius and ending at Sirius with a maximum of 3 stops")
     public void excercise6() {
-        List<Route> routes = routeFinder.findRoutes(DefaultDataset.highways, "Sirius", "Sirius", singletonList(((route) -> route.usedHighways.size() <= 3)));
+        List<Route> routes = routeFinder.findRoutes("Sirius", "Sirius", singletonList(((route) -> route.usedHighways.size() <= 3)));
         assertThat(routes)
                 .containsOnly(
                         routeParser.parse("Sirius -> Betelgeuse -> Sirius"),
@@ -62,7 +62,7 @@ public class Exercises {
     //@Test
     @DisplayName("Determine the number of routes starting at the solar system and ending at Sirius with exactly 3 stops inbetween.")
     public void excercise7() {
-        List<Route> routes = routeFinder.findRoutes(DefaultDataset.highways, "Solar System", "Sirius", singletonList(((route) -> route.usedHighways.size() == 4)));
+        List<Route> routes = routeFinder.findRoutes("Solar System", "Sirius", singletonList(((route) -> route.usedHighways.size() == 4)));
         assertThat(routes)
                 .containsOnly(
                         routeParser.parse("Solar System -> Alpha Centauri -> Sirius -> Betelgeuse -> Sirius"),
@@ -87,7 +87,7 @@ public class Exercises {
     //@Test
     @DisplayName("Determine all different routes starting at Sirius and ending at Sirius with an over traveltime less than 30.")
     public void excercise10() {
-        List<Route> routes = routeFinder.findRoutes(DefaultDataset.highways, "Sirius", "Sirius", singletonList(((route) -> route.calculateTravelTime() < 30)));
+        List<Route> routes = routeFinder.findRoutes("Sirius", "Sirius", singletonList(((route) -> route.calculateTravelTime() < 30)));
         assertThat(routes)
                 .containsOnly(
                         routeParser.parse("Sirius -> Betelgeuse -> Sirius"),

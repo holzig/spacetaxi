@@ -1,6 +1,5 @@
 package cma.otto.spacetaxi;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RouteParserTest {
 
@@ -34,7 +34,7 @@ public class RouteParserTest {
 
     @Test
     public void testTooShortRoute() {
-        Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             routeParser.parse("A");
         });
         assertThat(ex).hasMessage("NO SUCH ROUTE");

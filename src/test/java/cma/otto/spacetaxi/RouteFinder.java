@@ -6,32 +6,36 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+
 public class RouteFinder {
-    public RouteFinder() {
-    }
+    private Map<String, List<Highway>> highwaysByStartSystem;
 
-    List<Route> findRoutes(List<Highway> highways, String start, String target) {
-        return findRoutes(highways, start, target, Collections.emptyList());
-    }
-
-    List<Route> findRoutes(List<Highway> highways, String start, String target, List<Predicate<Route>> checks) {
-        Map<String, List<Highway>> highwaysByStartSystem = highways.stream()
+    public RouteFinder(List<Highway> highways) {
+        this.highwaysByStartSystem = highways.stream()
                 .collect(Collectors.groupingBy(highway -> highway.start));
+    }
+
+    List<Route> findRoutes(String start, String target) {
+        return findRoutes(start, target, emptyList());
+    }
+
+    List<Route> findRoutes(String start, String target, List<Predicate<Route>> checks) {
         Predicate<Route> filter = checks.stream()
                 .reduce(x -> true, Predicate::and);
-        return findRoutes(highwaysByStartSystem, start, target).stream()
+        return findRoutesi(start, target).stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
-    List<Route> findRoutes(Map<String, List<Highway>> highwaysByStartSystem, String start, String target) {
-        List<Highway> highwaysFromHere = highwaysByStartSystem.getOrDefault(start, Collections.emptyList());
+    private List<Route> findRoutesi(String start, String target) {
+        List<Highway> highwaysFromHere = this.highwaysByStartSystem.getOrDefault(start, emptyList());
         return highwaysFromHere.stream()
                 .map(highway -> {
                     if (isDestination(target, highway)) {
                         return Collections.singletonList(new Route(highway));
                     } else {
-                        return findRoutes(highwaysByStartSystem, highway.target, target).stream()
+                        return findRoutesi(highway.target, target).stream()
                                 .map(route -> new Route(highway, route.usedHighways))
                                 .collect(Collectors.toList());
                     }

@@ -20,53 +20,52 @@ public class FindRoutesTest {
     private final Highway b_c = new Highway("B", "C", 2);
     private final Highway c_a = new Highway("C", "A", 2);
     private final Highway c_b = new Highway("C", "B", 2);
-    private final RouteFinder routeFinder = new RouteFinder();
 
     @Test
     public void testWithSingleHighway() {
         List<Highway> highways = Arrays.asList(a_b);
-        assertThat(routeFinder.findRoutes(highways, "A", "B"))
+        assertThat(new RouteFinder(highways).findRoutes("A", "B"))
                 .containsOnly(new Route(a_b));
     }
 
     @Test
     public void testWithNoRouteFound() {
         List<Highway> highways = Arrays.asList(a_b);
-        assertThat(routeFinder.findRoutes(highways, "A", "C")).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutes("A", "C")).isEmpty();
     }
 
     @Test
     public void testMultipleStepsSingleRoute() {
         List<Highway> highways = Arrays.asList(a_b, b_c);
-        List<Route> routes = routeFinder.findRoutes(highways, "A", "C");
+        List<Route> routes = new RouteFinder(highways).findRoutes("A", "C");
         assertThat(routes).containsOnly(new Route(a_b, b_c));
     }
 
     @Test
     public void testMultipleStepsMultipleRoutes() {
         List<Highway> highways = Arrays.asList(a_b, b_c, a_c);
-        List<Route> routes = routeFinder.findRoutes(highways, "A", "C");
+        List<Route> routes = new RouteFinder(highways).findRoutes("A", "C");
         assertThat(routes).containsOnly(new Route(a_b, b_c), new Route(a_c));
     }
 
     @Test
     public void testRoundtrip() {
         List<Highway> highways = Arrays.asList(a_b, b_a);
-        List<Route> routes = routeFinder.findRoutes(highways, "A", "A");
+        List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_b, b_a));
     }
 
     @Test
     public void testMultiplePossibleRoundtrips() {
         List<Highway> highways = Arrays.asList(a_b, b_a, a_c, c_b);
-        List<Route> routes = routeFinder.findRoutes(highways, "A", "A");
+        List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_b, b_a), new Route(a_c, c_b, b_a));
     }
 
     @Test
     public void testSinglePossibleRoundtripsWithDeadEnds() {
         List<Highway> highways = Arrays.asList(a_b, a_c, a_d, c_a);
-        List<Route> routes = routeFinder.findRoutes(highways, "A", "A");
+        List<Route> routes = new RouteFinder(highways).findRoutes("A", "A");
         assertThat(routes).containsOnly(new Route(a_c, c_a));
     }
 
@@ -76,7 +75,7 @@ public class FindRoutesTest {
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(routeFinder.findRoutes(highways, "B", "A", Collections.singletonList(check))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutes("B", "A", Collections.singletonList(check))).isEmpty();
     }
 
     @Test
@@ -85,7 +84,7 @@ public class FindRoutesTest {
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
 
-        assertThat(routeFinder.findRoutes(highways, "B", "A", Collections.singletonList(check))).hasSize(1);
+        assertThat(new RouteFinder(highways).findRoutes("B", "A", Collections.singletonList(check))).hasSize(1);
     }
 
     @Test
@@ -96,7 +95,7 @@ public class FindRoutesTest {
         RouteCondition failure = mock(RouteCondition.class);
         when(failure.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(routeFinder.findRoutes(highways, "B", "A", Arrays.asList(success, failure))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutes("B", "A", Arrays.asList(success, failure))).isEmpty();
     }
 
 }
