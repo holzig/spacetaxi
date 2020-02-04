@@ -24,27 +24,27 @@ public class FindRoutesTest {
     @Test
     public void testWithSingleHighway() {
         List<Highway> highways = Arrays.asList(a_b);
-        assertThat(new RouteFinder(highways).findRoutes("A", "B"))
+        assertThat(new RouteFinder(highways).findRoutesCircle("A", "B", Collections.emptyList()))
                 .containsOnly(new Route(a_b));
     }
 
     @Test
     public void testWithNoRouteFound() {
         List<Highway> highways = Arrays.asList(a_b);
-        assertThat(new RouteFinder(highways).findRoutes("A", "C")).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList())).isEmpty();
     }
 
     @Test
     public void testMultipleStepsSingleRoute() {
         List<Highway> highways = Arrays.asList(a_b, b_c);
-        List<Route> routes = new RouteFinder(highways).findRoutes("A", "C");
+        List<Route> routes = new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList());
         assertThat(routes).containsOnly(new Route(a_b, b_c));
     }
 
     @Test
     public void testMultipleStepsMultipleRoutes() {
         List<Highway> highways = Arrays.asList(a_b, b_c, a_c);
-        List<Route> routes = new RouteFinder(highways).findRoutes("A", "C");
+        List<Route> routes = new RouteFinder(highways).findRoutesCircle("A", "C", Collections.emptyList());
         assertThat(routes).containsOnly(new Route(a_b, b_c), new Route(a_c));
     }
 
@@ -71,31 +71,43 @@ public class FindRoutesTest {
 
     @Test
     public void testRouteConditionCheckFailed() {
-        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        List<Highway> highways = Arrays.asList(b_c, c_a);
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(new RouteFinder(highways).findRoutes("B", "A", Collections.singletonList(check))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Collections.singletonList(check))).isEmpty();
     }
 
     @Test
     public void testRouteConditionCheckSuccess() {
-        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        List<Highway> highways = Arrays.asList(b_c, c_a);
         RouteCondition check = mock(RouteCondition.class);
         when(check.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
 
-        assertThat(new RouteFinder(highways).findRoutes("B", "A", Collections.singletonList(check))).hasSize(1);
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Collections.singletonList(check))).hasSize(1);
     }
 
     @Test
     public void testMultipleRouteConditionsOneFails() {
-        List<Highway> highways = Arrays.asList(a_b, a_c, b_c, c_a);
+        List<Highway> highways = Arrays.asList(b_c, c_a);
         RouteCondition success = mock(RouteCondition.class);
         when(success.test(ArgumentMatchers.any(Route.class))).thenReturn(true);
         RouteCondition failure = mock(RouteCondition.class);
         when(failure.test(ArgumentMatchers.any(Route.class))).thenReturn(false);
 
-        assertThat(new RouteFinder(highways).findRoutes("B", "A", Arrays.asList(success, failure))).isEmpty();
+        assertThat(new RouteFinder(highways).findRoutesCircle("B", "A", Arrays.asList(success, failure))).isEmpty();
+    }
+
+    @Test
+    public void testCircle() {
+        List<Highway> highways = Arrays.asList(a_b, b_a);
+        RouteCondition success = (r) -> r.usedHighways.size() <= 5;
+
+        List<Route> routesCircle = new RouteFinder(highways).findRoutesCircle("A", "A", Arrays.asList(success));
+        assertThat(routesCircle).containsOnly(
+                new Route(a_b, b_a),
+                new Route(a_b, b_a, a_b, b_a)
+        );
     }
 
 }
