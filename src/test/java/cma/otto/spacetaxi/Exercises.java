@@ -41,7 +41,7 @@ public class Exercises {
     @DisplayName("The distance of route Solar System -> Vega -> Betelgeuse")
     public void exercise5() {
         Exception ex = Assertions.assertThrows(
-                IllegalArgumentException.class,
+                NoSuchRouteException.class,
                 () -> assertThat(routeParser.parse("Solar System -> Vega -> Betelgeuse").calculateTravelTime()).isEqualTo(9)
         );
         assertThat(ex).hasMessage("NO SUCH ROUTE");

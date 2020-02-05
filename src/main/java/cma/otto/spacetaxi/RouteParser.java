@@ -17,10 +17,10 @@ public class RouteParser {
         this(highways.stream().collect(groupingBy(highway -> highway.start)));
     }
 
-    Route parse(String routeAsString) {
+    Route parse(String routeAsString) throws NoSuchRouteException {
         String[] steps = routeAsString.split("\\s*->\\s*");
         if (steps.length < 2) {
-            throw new IllegalArgumentException("NO SUCH ROUTE");
+            throw new NoSuchRouteException();
         }
         Route route = new Route();
         for (int i = 0; i < steps.length - 1; i++) {
@@ -29,7 +29,7 @@ public class RouteParser {
             Highway highway = this.highways.getOrDefault(start, Collections.emptyList()).stream()
                     .filter(h -> h.target.equals(target))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("NO SUCH ROUTE"));
+                    .orElseThrow(NoSuchRouteException::new);
             route.addHighway(highway);
         }
         return route;

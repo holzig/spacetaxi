@@ -34,7 +34,7 @@ public class RouteParserTest {
 
     @Test
     public void testTooShortRoute() {
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> routeParser.parse("A"));
+        Exception ex = assertThrows(NoSuchRouteException.class, () -> routeParser.parse("A"));
         assertThat(ex).hasMessage("NO SUCH ROUTE");
     }
 
