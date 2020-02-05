@@ -1,9 +1,6 @@
 package cma.otto.spacetaxi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Route {
@@ -67,20 +64,11 @@ public class Route {
     }
 
     public boolean containsLoop() {
-        String allHighways = usedHighways.stream().map(this::hts).collect(Collectors.joining(", "));
-
-        for (int i = 0; i < usedHighways.size() - 1; i++) {
-            String hts = hts(usedHighways.get(i));
-            String[] split = allHighways.split(hts, -1);
-            int count = split.length - 1;
-            if (count > 1) {
-                return true;
-            }
-        }
-        return false;
+        Map<Highway, Long> counts = usedHighways.stream()
+                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+        return counts.values().stream()
+                .max(Long::compareTo)
+                .orElse(0L) > 1;
     }
 
-    public String hts(Highway highway) {
-        return String.format("%s -> %s", highway.start, highway.target);
-    }
 }
