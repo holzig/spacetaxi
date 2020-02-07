@@ -17,7 +17,7 @@ public class RouteParser {
         this(highways.stream().collect(groupingBy(highway -> highway.start)));
     }
 
-    Route parse(String routeAsString) throws NoSuchRouteException {
+    public Route parse(String routeAsString) throws NoSuchRouteException {
         String[] steps = routeAsString.split("\\s*->\\s*");
         if (steps.length < 2) {
             throw new NoSuchRouteException();

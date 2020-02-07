@@ -27,17 +27,14 @@ public class Route {
         return usedHighways.get(usedHighways.size() - 1).target;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Route route = (Route) o;
-        return Objects.equals(usedHighways, route.usedHighways);
+    public Route extendBy(Highway extension) {
+        Route route = new Route(usedHighways);
+        route.addHighway(extension);
+        return route;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(usedHighways);
+    boolean hasReached(String target) {
+        return getFinalTarget().equals(target);
     }
 
     @Override
@@ -50,17 +47,7 @@ public class Route {
                 steps.add(highway.target);
             }
         }
-        return String.format("Route{%s steps: %s}(%s)", steps.size(), String.join(" -> ", steps), calculateTravelTime());
-    }
-
-    public Route extendBy(Highway extension) {
-        Route route = new Route(usedHighways);
-        route.addHighway(extension);
-        return route;
-    }
-
-    boolean hasReached(String target) {
-        return getFinalTarget().equals(target);
+        return String.format("Route{%s steps: %s}(travel time: %s)", steps.size(), String.join(" -> ", steps), calculateTravelTime());
     }
 
     public boolean containsLoop() {
@@ -69,6 +56,19 @@ public class Route {
         return counts.values().stream()
                 .max(Long::compareTo)
                 .orElse(0L) > 1;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(usedHighways);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Route route = (Route) o;
+        return Objects.equals(usedHighways, route.usedHighways);
     }
 
 }
