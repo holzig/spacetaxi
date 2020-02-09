@@ -3,10 +3,13 @@ package cma.otto.spacetaxi;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class represents the {@link Route} consisting of {@link Highway}s a space ship could take.
+ */
 public class Route {
-    final List<Highway> usedHighways;
+    private final List<Highway> usedHighways;
 
-    Route(List<Highway> steps) {
+    public Route(List<Highway> steps) {
         usedHighways = new ArrayList<>();
         usedHighways.addAll(steps);
     }
@@ -23,18 +26,47 @@ public class Route {
         return usedHighways.stream().map(highway -> highway.travelTime).reduce(0, Integer::sum);
     }
 
-    public String getFinalTarget() {
-        return usedHighways.get(usedHighways.size() - 1).target;
+    public int getStopsCount(Route route) {
+        return route.usedHighways.size();
     }
 
+    /**
+     * Creates a new {@link Route} which uses the same highways plus the given {@link Highway}
+     *
+     * @param extension An additional {@link Highway}
+     * @return the new {@link Route}
+     */
     public Route extendBy(Highway extension) {
         Route route = new Route(usedHighways);
         route.addHighway(extension);
         return route;
     }
 
-    boolean hasReached(String target) {
-        return getFinalTarget().equals(target);
+    /**
+     * Detects if the last target matches the given target.
+     *
+     * @param target the target to match against
+     */
+    public boolean hasReached(String target) {
+        return getFinalTarget().map(s -> s.equals(target)).orElse(false);
+    }
+
+    public Optional<String> getFinalTarget() {
+        if (usedHighways.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(usedHighways.get(usedHighways.size() - 1).target);
+    }
+
+    /**
+     * Detects if the Route travels the same {@link Highway} twice.
+     */
+    public boolean containsLoop() {
+        Map<Highway, Long> counts = usedHighways.stream()
+                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+        return counts.values().stream()
+                .max(Long::compareTo)
+                .orElse(0L) > 1;
     }
 
     @Override
@@ -48,14 +80,6 @@ public class Route {
             }
         }
         return String.format("Route{%s steps: %s}(travel time: %s)", steps.size(), String.join(" -> ", steps), calculateTravelTime());
-    }
-
-    public boolean containsLoop() {
-        Map<Highway, Long> counts = usedHighways.stream()
-                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
-        return counts.values().stream()
-                .max(Long::compareTo)
-                .orElse(0L) > 1;
     }
 
     @Override

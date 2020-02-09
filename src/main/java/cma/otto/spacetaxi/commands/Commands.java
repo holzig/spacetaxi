@@ -7,6 +7,11 @@ import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
+//TODO: All commands need more tests
+
+/**
+ * Main command for the App. All other Commands are loaded via this.
+ */
 @Command(
         name = "taxi",
         synopsisSubcommandLabel = "COMMAND",

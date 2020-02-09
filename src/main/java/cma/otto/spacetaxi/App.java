@@ -6,7 +6,11 @@ import picocli.CommandLine;
 public class App {
 
     public static void main(String[] args) {
-        System.exit(new CommandLine(new Commands()).execute(args));
+        System.exit(run(args));
+    }
+
+    static int run(String[] args) {
+        return new CommandLine(new Commands()).execute(args);
     }
 
 }
