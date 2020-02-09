@@ -23,3 +23,6 @@ Being successful you should see the help and further usage information displayed
   * Search by maximum stops or travel time: `taxi max --type=time --value 29 Sirius Sirius` 
 
 As already mentioned you can use the help system to see a more options and explanation `taxi --help`.
+
+### Assumptions
+The current interstellar highway structure only supports travel time in full hours, as a experience space traveller should know.
